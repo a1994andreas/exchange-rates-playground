@@ -1,7 +1,9 @@
 package com.exchangerates.client;
 
+import com.exchangerates.exception.FailedToRetrieveExchangesException;
 import com.exchangerates.model.ExchangeRate;
 import com.exchangerates.model.ExchangeRateResponse;
+import lombok.SneakyThrows;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.client.WebClient;
 
@@ -21,7 +23,7 @@ public class ExchangeRateClient {
 		this.webClient = webClientBuilder.baseUrl(BASE_EXCHANGE_RATES_URL).build();
 	}
 
-	public ExchangeRate getExchangeRate(Currency fromCurrency, Currency toCurrency) {
+	@SneakyThrows public ExchangeRate getExchangeRate(Currency fromCurrency, Currency toCurrency) {
 		ExchangeRateResponse exchangeRateResponse = this.webClient.get().uri(
 						uriBuilder -> uriBuilder
 								.queryParam("access_key", ACCESS_KEY)
@@ -29,6 +31,8 @@ public class ExchangeRateClient {
 								.build())
 				.retrieve().bodyToMono(ExchangeRateResponse.class).block();
 
+		if(exchangeRateResponse == null)
+			throw new FailedToRetrieveExchangesException();
 
 		Map<String, Double> exchangeRateMap = parseExchangeRateResponse(exchangeRateResponse);
 		Double fromCurrencyToUsd = exchangeRateMap.get(fromCurrency.getCurrencyCode());
@@ -38,12 +42,16 @@ public class ExchangeRateClient {
 
 	}
 
-	public List<ExchangeRate> getAllExchangeRatesForCurrency(Currency currency) {
+	@SneakyThrows public List<ExchangeRate> getAllExchangeRatesForCurrency(Currency currency) {
 		ExchangeRateResponse exchangeRateResponse = this.webClient.get().uri(
 						uriBuilder -> uriBuilder
 								.queryParam("access_key", ACCESS_KEY)
 								.build())
 				.retrieve().bodyToMono(ExchangeRateResponse.class).block();
+
+		if(exchangeRateResponse == null)
+			throw new FailedToRetrieveExchangesException();
+
 		Map<String, Double> exchangeRateMap = parseExchangeRateResponse(exchangeRateResponse);
 
 		Double currencyToUsd = exchangeRateMap.get(currency.getCurrencyCode());
