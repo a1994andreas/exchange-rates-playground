@@ -7,7 +7,7 @@ import java.util.Map;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 @Data
-public class ExchangeRateResponse {
+public class ExchangeRateHostResponse {
 	private boolean success;
 	private String terms;
 	private String privacy;
