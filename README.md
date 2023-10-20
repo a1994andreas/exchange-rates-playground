@@ -28,5 +28,5 @@ Integrated with two clients that are providing exchange rates.
 1. RestTemplate
 2. Converters
 3. Custom implementation to pick up a healthy client at runtime 
-4. Redis instance
+4. External dockerized Redis instance for caching
 5. Swagger
